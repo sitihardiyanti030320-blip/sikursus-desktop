@@ -5,6 +5,7 @@
  */
 package view;
 
+import model.Kursus;
 /**
  *
  * @author USER
@@ -178,7 +179,15 @@ public double hitungTotal() {
 try {
         String nama = txtNama.getText();
         String kursus = cmbKursus.getSelectedItem().toString();
-        double total = hitungTotal();
+
+Kursus k1 = new Kursus(
+    "JAVA-BSC",
+    kursus,
+    "BASIC",
+    Double.parseDouble(txtBiaya.getText())
+);
+
+double total = hitungTotal();
         
         txtHasil.setText("=== HASIL PENDAFTARAN KURSUS ===\n" +
                          "Nama Peserta  : " + nama + "\n" +
