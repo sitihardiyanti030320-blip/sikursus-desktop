@@ -1,0 +1,18 @@
+# Abaikan data mentah dan data bersih yang berukuran besar
+01_data_raw/
+02_data_clean/
+
+# Jika ingin menyisakan folder kosong di GitHub agar strukturnya tetap ada,
+# hapus dua baris di atas dan gunakan cara alternatif di bawah nanti.
+
+# Abaikan file temporer dan user settings milik Power BI
+*.tmp
+*.ini
+*.xlsx.lck
+.customerSharedStyles.json
+[Cc]ache/
+[Mm]emory[Mm]apped[Ff]iles/
+
+# Abaikan file user layout jika menggunakan format .pbip
+*.Settings
+*.UserWorkspace
