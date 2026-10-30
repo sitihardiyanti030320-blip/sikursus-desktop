@@ -28,110 +28,39 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroupJenisKelamin = new javax.swing.ButtonGroup();
-        rbLaki = new javax.swing.JPanel();
-        lblNim = new javax.swing.JLabel();
-        lblKodeAkses = new javax.swing.JLabel();
-        lblJenisKelamin = new javax.swing.JLabel();
-        lblKursus = new javax.swing.JLabel();
+        txtProdi = new javax.swing.JTextField();
+        txtNoHp = new javax.swing.JTextField();
+        cmbKursus = new javax.swing.JComboBox<>();
+        txtEmail = new javax.swing.JTextField();
+        cbModul = new javax.swing.JCheckBox();
+        lblnohp = new javax.swing.JLabel();
+        cbSertifikat = new javax.swing.JCheckBox();
+        lblemail = new javax.swing.JLabel();
+        cbRekaman = new javax.swing.JCheckBox();
+        lblfasilitas3 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        lbljudul = new javax.swing.JLabel();
+        lblnim = new javax.swing.JLabel();
+        lblkode = new javax.swing.JLabel();
+        lbljeniskelamin = new javax.swing.JLabel();
+        lblpilihkursus = new javax.swing.JLabel();
         txtNamaPeserta = new javax.swing.JTextField();
         btnSimpan = new javax.swing.JButton();
         btnResetForm = new javax.swing.JButton();
-        lblFasilitas = new javax.swing.JLabel();
+        lblprodi = new javax.swing.JLabel();
+        lblnamapeserta = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtRingkasanPendaftaran = new javax.swing.JTextPane();
-        lblHasil = new javax.swing.JLabel();
-        rbMahasiswa = new javax.swing.JRadioButton();
-        rbPerempuan = new javax.swing.JRadioButton();
-        cmbKursus = new javax.swing.JComboBox<>();
-        cbModul = new javax.swing.JCheckBox();
-        cbSertifikat = new javax.swing.JCheckBox();
-        cbRekaman = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        lblNama = new javax.swing.JLabel();
         txtNamaPeserta1 = new javax.swing.JTextField();
-        txtProdi = new javax.swing.JTextField();
-        txtNoHp = new javax.swing.JTextField();
-        txtEmail = new javax.swing.JTextField();
-        lblProdi = new javax.swing.JLabel();
-        lblNoHp = new javax.swing.JLabel();
-        lblEmail = new javax.swing.JLabel();
+        lblhasil = new javax.swing.JLabel();
+        rbLaki = new javax.swing.JRadioButton();
+        rbPerempuan = new javax.swing.JRadioButton();
         txtKodeAkses = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        rbLaki.setBackground(new java.awt.Color(255, 246, 231));
-
-        lblNim.setBackground(new java.awt.Color(240, 247, 255));
-        lblNim.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblNim.setForeground(new java.awt.Color(101, 72, 49));
-        lblNim.setText("NIM");
-
-        lblKodeAkses.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblKodeAkses.setForeground(new java.awt.Color(101, 72, 49));
-        lblKodeAkses.setText("Kode Akses");
-
-        lblJenisKelamin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblJenisKelamin.setForeground(new java.awt.Color(101, 72, 49));
-        lblJenisKelamin.setText("Jenis Kelamin");
-
-        lblKursus.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblKursus.setForeground(new java.awt.Color(101, 72, 49));
-        lblKursus.setText("Kursus");
-
-        txtNamaPeserta.setForeground(new java.awt.Color(101, 72, 49));
-        txtNamaPeserta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNamaPesertaActionPerformed(evt);
-            }
-        });
-
-        btnSimpan.setBackground(new java.awt.Color(139, 107, 74));
-        btnSimpan.setForeground(new java.awt.Color(255, 255, 255));
-        btnSimpan.setText("Simpan");
-        btnSimpan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSimpanActionPerformed(evt);
-            }
-        });
-
-        btnResetForm.setBackground(new java.awt.Color(255, 246, 231));
-        btnResetForm.setForeground(new java.awt.Color(101, 72, 49));
-        btnResetForm.setText("Resest");
-        btnResetForm.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetFormActionPerformed(evt);
-            }
-        });
-
-        lblFasilitas.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblFasilitas.setForeground(new java.awt.Color(101, 72, 49));
-        lblFasilitas.setText("Fasilitas");
-
-        txtRingkasanPendaftaran.setForeground(new java.awt.Color(101, 72, 49));
-        jScrollPane2.setViewportView(txtRingkasanPendaftaran);
-
-        lblHasil.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblHasil.setForeground(new java.awt.Color(101, 72, 49));
-        lblHasil.setText("Ringkasan");
-
-        buttonGroupJenisKelamin.add(rbMahasiswa);
-        rbMahasiswa.setForeground(new java.awt.Color(101, 72, 49));
-        rbMahasiswa.setText("Laki-Laki");
-
-        buttonGroupJenisKelamin.add(rbPerempuan);
-        rbPerempuan.setForeground(new java.awt.Color(101, 72, 49));
-        rbPerempuan.setText("Perempuan");
-
-        cmbKursus.setForeground(new java.awt.Color(101, 72, 49));
         cmbKursus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Pilih Kursus--", "UI/UX", "Pemrograman Java Desktop", "Pemrograman Web", "Database MySQL", "Dasar-Dasar Pemrograman" }));
-        cmbKursus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbKursusActionPerformed(evt);
-            }
-        });
 
-        cbModul.setForeground(new java.awt.Color(101, 72, 49));
         cbModul.setText("Modul Cetak");
         cbModul.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -139,10 +68,16 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
             }
         });
 
-        cbSertifikat.setForeground(new java.awt.Color(101, 72, 49));
+        lblnohp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblnohp.setForeground(new java.awt.Color(35, 65, 94));
+        lblnohp.setText("Nomor HP");
+
         cbSertifikat.setText("Sertifikat");
 
-        cbRekaman.setForeground(new java.awt.Color(101, 72, 49));
+        lblemail.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblemail.setForeground(new java.awt.Color(35, 65, 94));
+        lblemail.setText("Email");
+
         cbRekaman.setText("Akses Rekaman");
         cbRekaman.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -150,180 +85,219 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
             }
         });
 
-        jPanel2.setBackground(new java.awt.Color(139, 107, 74));
-        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
+        lblfasilitas3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblfasilitas3.setForeground(new java.awt.Color(35, 65, 94));
+        lblfasilitas3.setText("Fasilitas");
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Form Pendaftaran Kursus");
+        jPanel2.setBackground(new java.awt.Color(49, 91, 125));
+
+        lbljudul.setFont(new java.awt.Font("Times New Roman", 0, 24)); // NOI18N
+        lbljudul.setForeground(new java.awt.Color(255, 255, 255));
+        lbljudul.setText("Form Pendaftaran Kursus");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(145, 145, 145))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(146, 146, 146)
+                .addComponent(lbljudul, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lbljudul)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
-        lblNama.setBackground(new java.awt.Color(240, 247, 255));
-        lblNama.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblNama.setForeground(new java.awt.Color(101, 72, 49));
-        lblNama.setText("Nama Peserta");
+        lblnim.setBackground(new java.awt.Color(240, 247, 255));
+        lblnim.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblnim.setForeground(new java.awt.Color(35, 65, 94));
+        lblnim.setText("NIM");
 
-        txtNamaPeserta1.setForeground(new java.awt.Color(101, 72, 49));
+        lblkode.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblkode.setForeground(new java.awt.Color(35, 65, 94));
+        lblkode.setText("Kode Akses");
+
+        lbljeniskelamin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lbljeniskelamin.setForeground(new java.awt.Color(35, 65, 94));
+        lbljeniskelamin.setText("Jenis Peserta");
+
+        lblpilihkursus.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblpilihkursus.setForeground(new java.awt.Color(35, 65, 94));
+        lblpilihkursus.setText("Pilih Kursus");
+
+        txtNamaPeserta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNamaPesertaActionPerformed(evt);
+            }
+        });
+
+        btnSimpan.setBackground(new java.awt.Color(67, 133, 197));
+        btnSimpan.setForeground(new java.awt.Color(255, 255, 255));
+        btnSimpan.setText("Simpan");
+        btnSimpan.setActionCommand("Simpan");
+        btnSimpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSimpanActionPerformed(evt);
+            }
+        });
+
+        btnResetForm.setText("Reset");
+        btnResetForm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetFormActionPerformed(evt);
+            }
+        });
+
+        lblprodi.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblprodi.setForeground(new java.awt.Color(35, 65, 94));
+        lblprodi.setText("Program Studi");
+
+        lblnamapeserta.setBackground(new java.awt.Color(240, 247, 255));
+        lblnamapeserta.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblnamapeserta.setForeground(new java.awt.Color(35, 65, 94));
+        lblnamapeserta.setText("Nama Peserta");
+
+        jScrollPane2.setViewportView(txtRingkasanPendaftaran);
+
         txtNamaPeserta1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNamaPeserta1ActionPerformed(evt);
             }
         });
 
-        lblProdi.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblProdi.setForeground(new java.awt.Color(101, 72, 49));
-        lblProdi.setText("Program Studi");
+        lblhasil.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblhasil.setForeground(new java.awt.Color(35, 65, 94));
+        lblhasil.setText("Ringkasan");
 
-        lblNoHp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblNoHp.setForeground(new java.awt.Color(101, 72, 49));
-        lblNoHp.setText("Nomor HP");
+        buttonGroupJenisKelamin.add(rbLaki);
+        rbLaki.setText("Laki-Laki");
+        rbLaki.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbLakiActionPerformed(evt);
+            }
+        });
 
-        lblEmail.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblEmail.setForeground(new java.awt.Color(101, 72, 49));
-        lblEmail.setText("Email");
+        buttonGroupJenisKelamin.add(rbPerempuan);
+        rbPerempuan.setText("Perempuan");
 
         txtKodeAkses.setText("jPasswordField1");
-        txtKodeAkses.setToolTipText("241006");
-
-        javax.swing.GroupLayout rbLakiLayout = new javax.swing.GroupLayout(rbLaki);
-        rbLaki.setLayout(rbLakiLayout);
-        rbLakiLayout.setHorizontalGroup(
-            rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(rbLakiLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblJenisKelamin)
-                    .addComponent(lblKodeAkses)
-                    .addComponent(lblHasil)
-                    .addComponent(lblFasilitas)
-                    .addComponent(lblKursus)
-                    .addComponent(lblNim)
-                    .addComponent(lblNama)
-                    .addComponent(lblProdi)
-                    .addComponent(lblNoHp)
-                    .addComponent(lblEmail))
-                .addGap(33, 33, 33)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(rbLakiLayout.createSequentialGroup()
-                        .addComponent(cbModul, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cbSertifikat, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30)
-                        .addComponent(cbRekaman))
-                    .addComponent(txtEmail)
-                    .addComponent(txtNoHp)
-                    .addComponent(txtProdi)
-                    .addComponent(txtNamaPeserta)
-                    .addComponent(cmbKursus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtNamaPeserta1)
-                    .addGroup(rbLakiLayout.createSequentialGroup()
-                        .addComponent(rbMahasiswa, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(42, 42, 42)
-                        .addComponent(rbPerempuan, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 114, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2)
-                    .addComponent(txtKodeAkses))
-                .addGap(45, 45, 45))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rbLakiLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnSimpan)
-                .addGap(102, 102, 102)
-                .addComponent(btnResetForm)
-                .addGap(134, 134, 134))
-        );
-        rbLakiLayout.setVerticalGroup(
-            rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(rbLakiLayout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(rbLakiLayout.createSequentialGroup()
-                        .addComponent(lblNim)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblNama))
-                    .addGroup(rbLakiLayout.createSequentialGroup()
-                        .addComponent(txtNamaPeserta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtNamaPeserta1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblKodeAkses)
-                    .addComponent(txtKodeAkses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblJenisKelamin)
-                    .addComponent(rbMahasiswa)
-                    .addComponent(rbPerempuan))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblKursus)
-                    .addComponent(cmbKursus, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblProdi)
-                    .addComponent(txtProdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNoHp)
-                    .addComponent(txtNoHp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblEmail)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblFasilitas)
-                    .addComponent(cbModul)
-                    .addComponent(cbSertifikat, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbRekaman))
-                .addGap(18, 18, 18)
-                .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblHasil)
-                    .addGroup(rbLakiLayout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(rbLakiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnResetForm)
-                            .addComponent(btnSimpan))))
-                .addContainerGap(26, Short.MAX_VALUE))
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(rbLaki, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblkode)
+                            .addComponent(lblprodi)
+                            .addComponent(lblpilihkursus)
+                            .addComponent(lblnim)
+                            .addComponent(lblnamapeserta)
+                            .addComponent(lblnohp)
+                            .addComponent(lblemail)
+                            .addComponent(lbljeniskelamin)
+                            .addComponent(lblhasil)
+                            .addComponent(lblfasilitas3))
+                        .addGap(33, 33, 33)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNamaPeserta)
+                            .addComponent(cmbKursus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtNamaPeserta1)
+                            .addComponent(txtProdi)
+                            .addComponent(txtNoHp)
+                            .addComponent(txtEmail)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(rbLaki, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(55, 55, 55)
+                                        .addComponent(rbPerempuan, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(cbModul, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cbSertifikat, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cbRekaman)))
+                                .addGap(0, 2, Short.MAX_VALUE))
+                            .addComponent(txtKodeAkses, javax.swing.GroupLayout.Alignment.TRAILING))))
+                .addGap(45, 45, 45))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(151, 151, 151)
+                .addComponent(btnSimpan)
+                .addGap(75, 75, 75)
+                .addComponent(btnResetForm)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(rbLaki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtNamaPeserta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblnim)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblnamapeserta)
+                            .addComponent(txtNamaPeserta1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblkode)
+                    .addComponent(txtKodeAkses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbljeniskelamin)
+                    .addComponent(rbLaki)
+                    .addComponent(rbPerempuan))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbKursus, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblpilihkursus))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblprodi)
+                    .addComponent(txtProdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblnohp)
+                    .addComponent(txtNoHp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblemail)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblfasilitas3)
+                    .addComponent(cbModul)
+                    .addComponent(cbSertifikat, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbRekaman))
+                .addGap(18, 18, 18)
+                .addComponent(lblhasil)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSimpan)
+                    .addComponent(btnResetForm))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private String getJenisKelamin() {
+     private String getJenisKelamin() {
 
-        if (rbMahasiswa.isSelected()) {
+        if (rbLaki.isSelected()) {
             return "L";
         }
 
@@ -429,6 +403,14 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
         txtNamaPeserta.requestFocus();
     }
     
+    private void cbModulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbModulActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbModulActionPerformed
+
+    private void cbRekamanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRekamanActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbRekamanActionPerformed
+
     private void txtNamaPesertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaPesertaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNamaPesertaActionPerformed
@@ -679,21 +661,13 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnResetFormActionPerformed
 
-    private void cmbKursusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbKursusActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmbKursusActionPerformed
-
-    private void cbModulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbModulActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbModulActionPerformed
-
-    private void cbRekamanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRekamanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbRekamanActionPerformed
-
     private void txtNamaPeserta1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaPeserta1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNamaPeserta1ActionPerformed
+
+    private void rbLakiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbLakiActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbLakiActionPerformed
 
     /**
      * @param args the command line arguments
@@ -739,21 +713,20 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
     private javax.swing.JCheckBox cbRekaman;
     private javax.swing.JCheckBox cbSertifikat;
     private javax.swing.JComboBox<String> cmbKursus;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel lblEmail;
-    private javax.swing.JLabel lblFasilitas;
-    private javax.swing.JLabel lblHasil;
-    private javax.swing.JLabel lblJenisKelamin;
-    private javax.swing.JLabel lblKodeAkses;
-    private javax.swing.JLabel lblKursus;
-    private javax.swing.JLabel lblNama;
-    private javax.swing.JLabel lblNim;
-    private javax.swing.JLabel lblNoHp;
-    private javax.swing.JLabel lblProdi;
-    private javax.swing.JPanel rbLaki;
-    private javax.swing.JRadioButton rbMahasiswa;
+    private javax.swing.JLabel lblemail;
+    private javax.swing.JLabel lblfasilitas3;
+    private javax.swing.JLabel lblhasil;
+    private javax.swing.JLabel lbljeniskelamin;
+    private javax.swing.JLabel lbljudul;
+    private javax.swing.JLabel lblkode;
+    private javax.swing.JLabel lblnamapeserta;
+    private javax.swing.JLabel lblnim;
+    private javax.swing.JLabel lblnohp;
+    private javax.swing.JLabel lblpilihkursus;
+    private javax.swing.JLabel lblprodi;
+    private javax.swing.JRadioButton rbLaki;
     private javax.swing.JRadioButton rbPerempuan;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JPasswordField txtKodeAkses;

@@ -1,4 +1,3 @@
-
 package config;
 
 import java.sql.Connection;
@@ -8,7 +7,7 @@ import java.sql.SQLException;
 public class Database {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/db_sikursus1";
+            "jdbc:mysql://localhost:3306/db_sikursus2";
 
     private static final String USER = "root";
 
