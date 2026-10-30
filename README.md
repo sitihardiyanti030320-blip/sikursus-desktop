@@ -1,1 +1,0 @@
-# sikursus-desktop
