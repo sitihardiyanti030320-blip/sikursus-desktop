@@ -1,3 +1,4 @@
+
 package model;
 
 public class Peserta extends Orang {
@@ -7,22 +8,31 @@ public class Peserta extends Orang {
     private String jenisKelamin;
     private String email;
 
-    // Constructor lama tetap dipertahankan
-    public Peserta(int id, String nama, String noHp,
-                   String nim, String prodi) {
+    public Peserta() {
+        super();
+    }
 
+    // Constructor untuk praktikum inheritance dan validasi
+    public Peserta(int id, String nama, String noHp, String nim, String prodi) {
         super(id, nama, noHp);
         setNim(nim);
         setProdi(prodi);
     }
 
-    // Constructor baru untuk penyimpanan database
-    public Peserta(String nim, String nama,
-                   String jenisKelamin, String prodi,
-                   String noHp, String email) {
-
+    // Constructor untuk form pendaftaran
+    public Peserta(String nim, String nama, String jenisKelamin,
+                   String prodi, String noHp, String email) {
         super(0, nama, noHp);
+        setNim(nim);
+        setJenisKelamin(jenisKelamin);
+        setProdi(prodi);
+        setEmail(email);
+    }
 
+    // Constructor lengkap untuk data database
+    public Peserta(int id, String nama, String jenisKelamin,
+                   String prodi, String noHp, String email, String nim) {
+        super(id, nama, noHp);
         setNim(nim);
         setJenisKelamin(jenisKelamin);
         setProdi(prodi);
@@ -35,9 +45,7 @@ public class Peserta extends Orang {
 
     public void setNim(String nim) {
         if (nim == null || nim.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                "NIM tidak boleh kosong."
-            );
+            throw new IllegalArgumentException("NIM tidak boleh kosong.");
         }
         this.nim = nim.trim();
     }
@@ -48,9 +56,7 @@ public class Peserta extends Orang {
 
     public void setProdi(String prodi) {
         if (prodi == null || prodi.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                "Program studi tidak boleh kosong."
-            );
+            throw new IllegalArgumentException("Program studi tidak boleh kosong.");
         }
         this.prodi = prodi.trim();
     }
@@ -60,12 +66,6 @@ public class Peserta extends Orang {
     }
 
     public void setJenisKelamin(String jenisKelamin) {
-        if (!"L".equals(jenisKelamin)
-                && !"P".equals(jenisKelamin)) {
-            throw new IllegalArgumentException(
-                "Jenis kelamin harus L atau P."
-            );
-        }
         this.jenisKelamin = jenisKelamin;
     }
 
@@ -74,13 +74,6 @@ public class Peserta extends Orang {
     }
 
     public void setEmail(String email) {
-        this.email = email == null ? "" : email.trim();
-    }
-
-    @Override
-    public String getInfo() {
-        return "PESERTA | " + super.getInfo()
-                + " | NIM: " + getNim()
-                + " | Prodi: " + getProdi();
+        this.email = email;
     }
 }
