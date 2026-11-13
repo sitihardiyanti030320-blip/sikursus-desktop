@@ -513,12 +513,13 @@ public class FormPendaftaranKursus extends javax.swing.JFrame {
 
             // Membuat objek peserta
             Peserta peserta = new Peserta(
-                nim,
+                0,
                 nama,
                 jenisKelamin,
                 prodi,
                 noHp,
-                email
+                email,
+                nim
             );
 
             // Menyimpan data ke database

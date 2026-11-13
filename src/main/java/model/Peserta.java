@@ -1,79 +1,61 @@
-
 package model;
 
 public class Peserta extends Orang {
-
     private String nim;
-    private String prodi;
     private String jenisKelamin;
+    private String prodi;
     private String email;
 
-    public Peserta() {
-        super();
+    public Peserta() {}
+
+    public Peserta(int id, String nama, String jenisKelamin, String prodi,
+                   String noHp, String email, String nim) {
+        super(id, nama, noHp);
+        setNim(nim);
+        setJenisKelamin(jenisKelamin);
+        setProdi(prodi);
+        setEmail(email);
     }
 
-    // Constructor untuk praktikum inheritance dan validasi
+    // Konstruktor kompatibilitas untuk praktikum P5/P6 lama.
     public Peserta(int id, String nama, String noHp, String nim, String prodi) {
-        super(id, nama, noHp);
-        setNim(nim);
-        setProdi(prodi);
+        this(id, nama, "L", prodi, noHp,
+                (nim == null ? "" : nim.trim()) + "@example.test", nim);
     }
 
-    // Constructor untuk form pendaftaran
-    public Peserta(String nim, String nama, String jenisKelamin,
-                   String prodi, String noHp, String email) {
-        super(0, nama, noHp);
-        setNim(nim);
-        setJenisKelamin(jenisKelamin);
-        setProdi(prodi);
-        setEmail(email);
-    }
-
-    // Constructor lengkap untuk data database
-    public Peserta(int id, String nama, String jenisKelamin,
-                   String prodi, String noHp, String email, String nim) {
-        super(id, nama, noHp);
-        setNim(nim);
-        setJenisKelamin(jenisKelamin);
-        setProdi(prodi);
-        setEmail(email);
-    }
-
-    public String getNim() {
-        return nim;
-    }
-
-    public void setNim(String nim) {
-        if (nim == null || nim.trim().isEmpty()) {
-            throw new IllegalArgumentException("NIM tidak boleh kosong.");
-        }
+    public String getNim() { return nim; }
+    public final void setNim(String nim) {
+        if (nim == null || nim.trim().isEmpty()) throw new IllegalArgumentException("NIM wajib diisi");
         this.nim = nim.trim();
     }
 
-    public String getProdi() {
-        return prodi;
+    public String getJenisKelamin() { return jenisKelamin; }
+    public final void setJenisKelamin(String jenisKelamin) {
+        String value = jenisKelamin == null ? "" : jenisKelamin.trim().toUpperCase();
+        if (!"L".equals(value) && !"P".equals(value)) {
+            throw new IllegalArgumentException("Jenis kelamin harus L atau P");
+        }
+        this.jenisKelamin = value;
     }
 
-    public void setProdi(String prodi) {
-        if (prodi == null || prodi.trim().isEmpty()) {
-            throw new IllegalArgumentException("Program studi tidak boleh kosong.");
-        }
+    public String getProdi() { return prodi; }
+    public final void setProdi(String prodi) {
+        if (prodi == null || prodi.trim().isEmpty()) throw new IllegalArgumentException("Prodi wajib diisi");
         this.prodi = prodi.trim();
     }
 
-    public String getJenisKelamin() {
-        return jenisKelamin;
+    public String getEmail() { return email == null ? "" : email; }
+    public final void setEmail(String email) {
+        String value = email == null ? "" : email.trim();
+        if (!value.isEmpty() && !value.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new IllegalArgumentException("Format email tidak valid");
+        }
+        this.email = value;
     }
 
-    public void setJenisKelamin(String jenisKelamin) {
-        this.jenisKelamin = jenisKelamin;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public String getInfo() {
+        return "PESERTA | " + super.getInfo() + " | NIM: " + getNim()
+                + " | JK: " + getJenisKelamin() + " | Prodi: " + getProdi();
     }
 }
