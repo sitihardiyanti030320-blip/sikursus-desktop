@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 /**
- * Jalankan SATU KALI: klik kanan file ini -> Run File.
+ * Jalankan sekali (klik kanan > Run File) untuk membuat akun demo.
+ * Jika tabel users masih berisi akun lama dengan format hash berbeda,
+ * kosongkan dulu:  DELETE FROM users;
  */
 public final class UserSeeder {
-
-    private UserSeeder() {
-    }
+    private UserSeeder() {}
 
     public static void main(String[] args) {
         try {
@@ -26,14 +26,18 @@ public final class UserSeeder {
 
     private static void seed(String username, char[] password, String role)
             throws SQLException {
+
         String sql = "INSERT IGNORE INTO users"
                 + "(username,password_hash,role,aktif) VALUES (?,?,?,1)";
+
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, username);
             ps.setString(2, PasswordUtil.hash(password));
             ps.setString(3, role);
             ps.executeUpdate();
+
         } finally {
             Arrays.fill(password, '\0');
         }

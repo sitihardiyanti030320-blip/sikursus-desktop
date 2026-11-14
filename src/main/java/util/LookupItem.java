@@ -1,6 +1,10 @@
 package util;
 
+/**
+ * Item sederhana untuk JComboBox: menyimpan id dan teks yang ditampilkan.
+ */
 public class LookupItem {
+
     private final int id;
     private final String label;
 
@@ -9,9 +13,16 @@ public class LookupItem {
         this.label = label;
     }
 
-    public int getId() { return id; }
-    public String getLabel() { return label; }
+    public int getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 
     @Override
-    public String toString() { return label; }
+    public String toString() {
+        return label;
+    }
 }

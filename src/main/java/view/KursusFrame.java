@@ -1,188 +1,319 @@
 package view;
 
 import dao.KursusDAO;
-import java.awt.BorderLayout;
+import java.awt.*;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Kursus;
+import util.Theme;
 
-/**
- * Master Kursus: CRUD + pencarian dengan JTable.
- */
 public class KursusFrame extends JFrame {
 
-    private final JTextField kode = new JTextField();
-    private final JTextField nama = new JTextField();
-    private final JComboBox<String> level =
-            new JComboBox<>(new String[]{"BASIC", "INTERMEDIATE", "ADVANCED"});
-    private final JTextField biaya = new JTextField();
-    private final JTextField search = new JTextField(18);
-    private final JTable table = new JTable(
-            ViewUtil.tableModel("ID", "Kode", "Nama Kursus", "Level", "Biaya"));
+    private JTextField txtKode, txtNama, txtBiaya, txtCari;
+    private JComboBox<String> cmbLevel;
+    private JTable tabel;
+    private DefaultTableModel model;
+    private int idTerpilih = -1;
+
     private final KursusDAO dao = new KursusDAO();
-    private int selected = -1;
 
     public KursusFrame() {
-        super("Master Kursus - SIKURSUS Desktop");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        ViewUtil.setupFrame(this, 940, 650);
-        build();
-        load("");
+        setTitle("SIKURSUS - Data Kursus");
+        setSize(950, 650);
+        Theme.styleFrame(this);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        initComponents();
+        tampilData("");
     }
 
-    // ------------------------------------------------------------ tampilan
+    private void initComponents() {
+        JPanel form = Theme.createCard(
+                new GridBagLayout(), "FORM KURSUS");
 
-    private void build() {
-        JPanel root = ViewUtil.root("Master Data Kursus");
-        JPanel body = ViewUtil.body();
+        txtKode = new JTextField();
+        txtNama = new JTextField();
+        txtBiaya = new JTextField();
 
-        JPanel form = ViewUtil.formPanel();
-        ViewUtil.addFormRow(form, 0, "Kode Kursus", kode);
-        ViewUtil.addFormRow(form, 1, "Nama Kursus", nama);
-        ViewUtil.addFormRow(form, 2, "Level", level);
-        ViewUtil.addFormRow(form, 3, "Biaya", biaya);
+        cmbLevel = new JComboBox<>(
+                new String[]{"BASIC", "INTERMEDIATE", "ADVANCED"});
 
-        JButton simpan = ViewUtil.primaryButton("Simpan");
-        JButton ubah = ViewUtil.updateButton("Ubah");
-        JButton hapus = ViewUtil.dangerButton("Hapus");
-        JButton reset = ViewUtil.neutralButton("Reset");
+        Theme.addField(form, 0, 0, "Kode Kursus", txtKode);
+        Theme.addField(form, 0, 1, "Nama Kursus", txtNama);
+        Theme.addField(form, 1, 0, "Level", cmbLevel);
+        Theme.addField(form, 1, 1, "Biaya (Rp)", txtBiaya);
 
-        JPanel formBox = new JPanel(new BorderLayout());
-        formBox.setBackground(ViewUtil.BG);
-        formBox.add(form, BorderLayout.CENTER);
-        formBox.add(ViewUtil.actionPanel(simpan, ubah, hapus, reset), BorderLayout.SOUTH);
+        JButton btnSimpan = Theme.createButton("Simpan", Theme.BTN_SAVE);
+        JButton btnUbah = Theme.createButton("Ubah", Theme.BTN_EDIT);
+        JButton btnHapus = Theme.createButton("Hapus", Theme.BTN_DELETE);
+        JButton btnReset = Theme.createButton("Reset", Theme.BTN_NEUTRAL);
 
-        JButton cari = ViewUtil.updateButton("Cari");
-        JPanel tableBox = new JPanel(new BorderLayout(0, 8));
-        tableBox.setBackground(ViewUtil.CARD);
-        tableBox.add(ViewUtil.searchPanel("Pencarian", search, cari), BorderLayout.NORTH);
-        tableBox.add(ViewUtil.tableScroll(table), BorderLayout.CENTER);
+        Theme.addButtonRow(form, 2, 4,
+                btnSimpan, btnUbah, btnHapus, btnReset);
 
-        body.add(ViewUtil.section("Form Kursus", formBox), BorderLayout.NORTH);
-        body.add(ViewUtil.section("Data Kursus", tableBox), BorderLayout.CENTER);
-        root.add(body, BorderLayout.CENTER);
-        setContentPane(root);
+        JPanel tablePanel = Theme.createCard(
+                new BorderLayout(0, 12), "DATA KURSUS");
 
-        simpan.addActionListener(e -> save());
-        ubah.addActionListener(e -> update());
-        hapus.addActionListener(e -> delete());
-        reset.addActionListener(e -> clear());
-        cari.addActionListener(e -> load(search.getText()));
-        search.addActionListener(e -> load(search.getText()));
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                pick();
+        txtCari = new JTextField();
+        txtCari.setToolTipText("Cari kode, nama, atau level kursus");
+
+        JButton btnCari = Theme.createButton("Cari", Theme.BTN_EDIT);
+
+        model = new DefaultTableModel(
+                new String[]{
+                    "ID", "Kode", "Nama Kursus", "Level", "Biaya (Rp)"
+                }, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tabel = new JTable(model);
+        Theme.styleTable(tabel);
+        tabel.setAutoCreateRowSorter(true);
+        Theme.fixedWidth(tabel, 0, 50);
+
+        NumberFormat nf = NumberFormat.getNumberInstance(
+                new Locale("id", "ID"));
+
+        tabel.getColumnModel().getColumn(4).setCellRenderer(
+                new Theme.TableRenderer(
+                        SwingConstants.RIGHT,
+                        v -> v instanceof Number
+                                ? "Rp " + nf.format(
+                                        ((Number) v).doubleValue())
+                                : Theme.str(v)
+                )
+        );
+
+        tablePanel.add(
+                Theme.createSearchBar(txtCari, btnCari),
+                BorderLayout.NORTH);
+        tablePanel.add(Theme.createScroll(tabel), BorderLayout.CENTER);
+
+        setContentPane(Theme.createPage(
+                "DATA KURSUS",
+                "Kelola program dan biaya kursus",
+                form, tablePanel));
+
+        btnSimpan.addActionListener(e -> simpan());
+        btnUbah.addActionListener(e -> ubah());
+        btnHapus.addActionListener(e -> hapus());
+        btnReset.addActionListener(e -> reset());
+
+        btnCari.addActionListener(e ->
+                tampilData(txtCari.getText().trim()));
+        txtCari.addActionListener(e ->
+                tampilData(txtCari.getText().trim()));
+
+        tabel.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()
+                    && tabel.getSelectedRow() >= 0) {
+                pilihData();
             }
         });
-        getRootPane().setDefaultButton(simpan);
     }
 
-    // --------------------------------------------------------------- data
+    private void tampilData(String keyword) {
+        model.setRowCount(0);
 
-    private Kursus data() {
-        double nilaiBiaya;
         try {
-            nilaiBiaya = Double.parseDouble(biaya.getText().trim());
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("Biaya harus berupa angka");
-        }
-        return new Kursus(Math.max(selected, 0), kode.getText(), nama.getText(),
-                level.getSelectedItem().toString(), nilaiBiaya);
-    }
+            List<Kursus> data = dao.search(keyword);
 
-    private void load(String keyword) {
-        try {
-            List<Kursus> list = dao.search(keyword);
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.setRowCount(0);
-            for (Kursus k : list) {
-                // Locale.US: pemisah ribuan selalu "," sehingga mudah dikembalikan ke angka
+            for (Kursus k : data) {
                 model.addRow(new Object[]{
-                    k.getIdKursus(), k.getKode(), k.getNama(), k.getLevel(),
-                    String.format(Locale.US, "%,.0f", k.getBiaya())
+                    k.getIdKursus(),
+                    k.getKode(),
+                    k.getNama(),
+                    k.getLevel(),
+                    k.getBiaya()
                 });
             }
         } catch (SQLException ex) {
-            ViewUtil.sqlError(this, "Memuat kursus", ex);
+            showError("Memuat data kursus", ex);
         }
     }
 
-    private void pick() {
-        int r = table.getSelectedRow();
-        if (r < 0) {
-            return;
-        }
-        selected = Integer.parseInt(table.getValueAt(r, 0).toString());
-        kode.setText(table.getValueAt(r, 1).toString());
-        nama.setText(table.getValueAt(r, 2).toString());
-        level.setSelectedItem(table.getValueAt(r, 3));
-        biaya.setText(table.getValueAt(r, 4).toString().replace(",", ""));
+    private void pilihData() {
+        int row = tabel.getSelectedRow();
+        if (row < 0) return;
+
+        row = tabel.convertRowIndexToModel(row);
+
+        idTerpilih = Integer.parseInt(
+                model.getValueAt(row, 0).toString());
+
+        txtKode.setText(Theme.str(model.getValueAt(row, 1)));
+        txtNama.setText(Theme.str(model.getValueAt(row, 2)));
+        cmbLevel.setSelectedItem(
+                Theme.str(model.getValueAt(row, 3)));
+
+        // Tampilkan biaya tanpa notasi ilmiah (mis. 1.5E7).
+        double biaya = Double.parseDouble(
+                model.getValueAt(row, 4).toString());
+        txtBiaya.setText(BigDecimal.valueOf(biaya)
+                .stripTrailingZeros().toPlainString());
     }
 
-    // --------------------------------------------------------------- aksi
-
-    private void save() {
-        try {
-            dao.insert(data());
-            load("");
-            clear();
-        } catch (Exception ex) {
-            handle(ex, "Menyimpan kursus");
-        }
-    }
-
-    private void update() {
-        if (selected < 0) {
-            JOptionPane.showMessageDialog(this, "Pilih kursus pada tabel terlebih dahulu.");
-            return;
-        }
-        try {
-            dao.update(data());
-            load("");
-            clear();
-        } catch (Exception ex) {
-            handle(ex, "Mengubah kursus");
-        }
-    }
-
-    private void delete() {
-        if (selected < 0) {
-            JOptionPane.showMessageDialog(this, "Pilih kursus pada tabel terlebih dahulu.");
-            return;
-        }
-        int ok = JOptionPane.showConfirmDialog(this, "Hapus kursus ini?",
-                "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        if (ok != JOptionPane.YES_OPTION) {
-            return;
-        }
-        try {
-            dao.delete(selected);
-            load("");
-            clear();
-        } catch (SQLException ex) {
-            ViewUtil.sqlError(this, "Menghapus kursus", ex);
-        }
-    }
-
-    private void clear() {
-        selected = -1;
-        kode.setText("");
-        nama.setText("");
-        level.setSelectedIndex(0);
-        biaya.setText("");
-        table.clearSelection();
-        kode.requestFocus();
-    }
-
-    private void handle(Exception ex, String action) {
-        if (ex instanceof SQLException) {
-            ViewUtil.sqlError(this, action, (SQLException) ex);
-        } else {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
+    private boolean validasi() {
+        if (txtKode.getText().trim().isEmpty()
+                || txtNama.getText().trim().isEmpty()
+                || txtBiaya.getText().trim().isEmpty()) {
+            Theme.showMessage(this,
+                    "Semua data kursus wajib diisi.",
                     "Validasi", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
+
+        try {
+            double biaya = Double.parseDouble(
+                    txtBiaya.getText().trim());
+
+            if (biaya < 0) {
+                Theme.showMessage(this,
+                        "Biaya tidak boleh negatif.",
+                        "Validasi", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+        } catch (NumberFormatException e) {
+            Theme.showMessage(this,
+                    "Biaya harus berupa angka.",
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Membuat objek Kursus dari isi form.
+    private Kursus getFormData() {
+        return new Kursus(
+                idTerpilih < 0 ? 0 : idTerpilih,
+                txtKode.getText().trim(),
+                txtNama.getText().trim(),
+                cmbLevel.getSelectedItem().toString(),
+                Double.parseDouble(txtBiaya.getText().trim()));
+    }
+
+    private void simpan() {
+        if (!validasi()) return;
+
+        try {
+            if (dao.insert(getFormData())) {
+                Theme.showMessage(this,
+                        "Data kursus berhasil disimpan.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            } else {
+                Theme.showMessage(this,
+                        "Gagal menyimpan data kursus.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IllegalArgumentException ex) {
+            Theme.showMessage(this, ex.getMessage(),
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1062) {
+                Theme.showMessage(this,
+                        "Kode kursus sudah digunakan. Gunakan kode yang berbeda.",
+                        "Validasi", JOptionPane.WARNING_MESSAGE);
+            } else {
+                showError("Menyimpan data kursus", ex);
+            }
+        }
+    }
+
+    private void ubah() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this,
+                    "Pilih data yang ingin diubah.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!validasi()) return;
+
+        try {
+            if (dao.update(getFormData())) {
+                Theme.showMessage(this,
+                        "Data kursus berhasil diubah.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            } else {
+                Theme.showMessage(this,
+                        "Data kursus tidak ditemukan.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (IllegalArgumentException ex) {
+            Theme.showMessage(this, ex.getMessage(),
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1062) {
+                Theme.showMessage(this,
+                        "Kode kursus sudah dipakai kursus lain.",
+                        "Validasi", JOptionPane.WARNING_MESSAGE);
+            } else {
+                showError("Mengubah data kursus", ex);
+            }
+        }
+    }
+
+    private void hapus() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this,
+                    "Pilih data yang ingin dihapus.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int konfirmasi = Theme.showConfirm(
+                this, "Hapus data kursus ini?",
+                "Konfirmasi Hapus");
+
+        if (konfirmasi != JOptionPane.YES_OPTION) return;
+
+        try {
+            if (dao.delete(idTerpilih)) {
+                Theme.showMessage(this,
+                        "Data berhasil dihapus.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            }
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1451) {
+                Theme.showMessage(this,
+                        "Kursus tidak dapat dihapus karena masih digunakan oleh kelas.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                showError("Menghapus data kursus", ex);
+            }
+        }
+    }
+
+    private void reset() {
+        idTerpilih = -1;
+        tabel.clearSelection();
+
+        txtKode.setText("");
+        txtNama.setText("");
+        txtBiaya.setText("");
+        txtCari.setText("");
+
+        cmbLevel.setSelectedIndex(0);
+
+        tampilData("");
+        txtKode.requestFocus();
+    }
+
+    private void showError(String aksi, SQLException ex) {
+        Theme.showMessage(this,
+                "Gagal " + aksi + ":\n" + ex.getMessage(),
+                "Database Error", JOptionPane.ERROR_MESSAGE);
     }
 }

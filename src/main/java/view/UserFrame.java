@@ -1,235 +1,433 @@
 package view;
 
-import dao.UserDAO;
-import java.awt.BorderLayout;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import config.Database;
 import model.User;
+import util.PasswordUtil;
+import util.Theme;
 import util.UserSession;
 
-/**
- * Master Users (khusus ADMIN): tambah user, ubah role/status, reset password, hapus.
- */
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+
 public class UserFrame extends JFrame {
 
-    private final JTextField username = new JTextField();
-    private final JPasswordField password = new JPasswordField();
-    private final JComboBox<String> role = new JComboBox<>(new String[]{"ADMIN", "OPERATOR"});
-    private final JCheckBox aktif = new JCheckBox("Akun aktif", true);
-    private final JTextField search = new JTextField(18);
-    private final JTable table = new JTable(
-            ViewUtil.tableModel("ID", "Username", "Role", "Aktif"));
-    private final UserDAO dao = new UserDAO();
-    private int selected = -1;
+    private JTextField txtUsername, txtCari;
+    private JPasswordField txtPassword;
+    private JComboBox<String> cmbRole;
+    private JCheckBox chkAktif;
+
+    private JTable tblUser;
+    private DefaultTableModel model;
+
+    private JButton btnSimpan, btnUbah, btnHapus;
+    private JButton btnReset, btnMuatUlang, btnCari;
+
+    private int idTerpilih = -1;
 
     public UserFrame() {
-        super("Master Users - SIKURSUS Desktop");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        ViewUtil.setupFrame(this, 940, 680);
-        build();
-        load("");
+        setTitle("Manajemen User - SIKURSUS");
+        setSize(950, 680);
+        setMinimumSize(new Dimension(850, 580));
+        Theme.styleFrame(this);
+
+        buatTampilan();
+        tampilkanUser("");
     }
 
-    // ------------------------------------------------------------ tampilan
+    private boolean isAkunSendiri(int idUser) {
+        User user = UserSession.getCurrentUser();
+        return user != null && user.getIdUser() == idUser;
+    }
 
-    private void build() {
-        JPanel root = ViewUtil.root("Master Data Users");
-        JPanel body = ViewUtil.body();
+    private void buatTampilan() {
+        setContentPane(Theme.createPage(
+                "MANAJEMEN USER",
+                "Kelola akun, hak akses, dan status pengguna",
+                buatPanelForm(),
+                buatPanelTabel()));
+    }
 
-        aktif.setBackground(ViewUtil.CARD);
-        JPanel form = ViewUtil.formPanel();
-        ViewUtil.addFormRow(form, 0, "Username", username);
-        ViewUtil.addFormRow(form, 1, "Password (user baru / reset)", password);
-        ViewUtil.addFormRow(form, 2, "Role", role);
-        ViewUtil.addFormRow(form, 3, "Status", aktif);
+    private JPanel buatPanelForm() {
+        JPanel panelForm = Theme.createCard(
+                new GridBagLayout(), "FORM USER");
 
-        JButton simpan = ViewUtil.primaryButton("Simpan User Baru");
-        JButton ubah = ViewUtil.updateButton("Ubah Role/Status");
-        JButton resetPw = ViewUtil.updateButton("Reset Password");
-        JButton hapus = ViewUtil.dangerButton("Hapus");
-        JButton reset = ViewUtil.neutralButton("Reset Form");
+        txtUsername = new JTextField();
+        txtPassword = new JPasswordField();
+        cmbRole = new JComboBox<>(new String[]{"OPERATOR", "ADMIN"});
+        chkAktif = new JCheckBox("Akun aktif", true);
 
-        JPanel formBox = new JPanel(new BorderLayout());
-        formBox.setBackground(ViewUtil.BG);
-        formBox.add(form, BorderLayout.CENTER);
-        formBox.add(ViewUtil.actionPanel(simpan, ubah, resetPw, hapus, reset), BorderLayout.SOUTH);
+        Theme.addField(panelForm, 0, 0, "Username", txtUsername);
+        Theme.addField(panelForm, 0, 1, "Password", txtPassword);
+        Theme.addField(panelForm, 1, 0, "Role", cmbRole);
+        Theme.addField(panelForm, 1, 1, "Status Akun", chkAktif);
 
-        JButton cari = ViewUtil.updateButton("Cari");
-        JPanel tableBox = new JPanel(new BorderLayout(0, 8));
-        tableBox.setBackground(ViewUtil.CARD);
-        tableBox.add(ViewUtil.searchPanel("Pencarian", search, cari), BorderLayout.NORTH);
-        tableBox.add(ViewUtil.tableScroll(table), BorderLayout.CENTER);
+        JLabel lblInfo = new JLabel(
+                "Password minimal 8 karakter. Kosongkan saat mengubah "
+                + "jika tidak ingin mengganti password.");
+        lblInfo.setFont(Theme.font(Font.ITALIC, 11));
+        lblInfo.setForeground(Theme.MUTED);
 
-        body.add(ViewUtil.section("Form User", formBox), BorderLayout.NORTH);
-        body.add(ViewUtil.section("Data User", tableBox), BorderLayout.CENTER);
-        root.add(body, BorderLayout.CENTER);
-        setContentPane(root);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 0, 0, 0);
+        panelForm.add(lblInfo, gbc);
 
-        simpan.addActionListener(e -> save());
-        ubah.addActionListener(e -> update());
-        resetPw.addActionListener(e -> resetPassword());
-        hapus.addActionListener(e -> delete());
-        reset.addActionListener(e -> clear());
-        cari.addActionListener(e -> load(search.getText()));
-        search.addActionListener(e -> load(search.getText()));
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                pick();
+        btnSimpan = Theme.createButton("Simpan", Theme.BTN_SAVE);
+        btnUbah = Theme.createButton("Ubah", Theme.BTN_EDIT);
+        btnHapus = Theme.createButton("Hapus", Theme.BTN_DELETE);
+        btnReset = Theme.createButton("Reset", Theme.BTN_NEUTRAL);
+        btnMuatUlang = Theme.createButton("Muat Ulang", Theme.BTN_SUCCESS);
+
+        Theme.addButtonRow(panelForm, 3, 5,
+                btnSimpan, btnUbah, btnHapus, btnReset, btnMuatUlang);
+
+        btnSimpan.addActionListener(e -> tambahUser());
+        btnUbah.addActionListener(e -> ubahUser());
+        btnHapus.addActionListener(e -> hapusUser());
+        btnReset.addActionListener(e -> resetForm());
+        btnMuatUlang.addActionListener(e -> {
+            txtCari.setText("");
+            tampilkanUser("");
+        });
+
+        return panelForm;
+    }
+
+    private JPanel buatPanelTabel() {
+        JPanel panel = Theme.createCard(
+                new BorderLayout(0, 10), "DATA USER");
+
+        txtCari = new JTextField();
+        txtCari.setToolTipText("Cari berdasarkan username atau role");
+
+        btnCari = Theme.createButton("Cari", Theme.BTN_EDIT);
+
+        model = new DefaultTableModel(
+                new Object[]{"ID", "Username", "Role", "Status"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tblUser = new JTable(model);
+        Theme.styleTable(tblUser);
+        tblUser.setAutoCreateRowSorter(true);
+
+        Theme.TableRenderer renderer =
+                new Theme.TableRenderer(SwingConstants.CENTER, null);
+
+        for (int i = 0; i < tblUser.getColumnCount(); i++) {
+            tblUser.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
+
+        Theme.fixedWidth(tblUser, 0, 60);
+        tblUser.getColumnModel().getColumn(1).setPreferredWidth(250);
+        tblUser.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblUser.getColumnModel().getColumn(3).setPreferredWidth(150);
+
+        tblUser.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                pilihData();
             }
         });
+
+        panel.add(Theme.createSearchBar(txtCari, btnCari),
+                BorderLayout.NORTH);
+        panel.add(Theme.createScroll(tblUser), BorderLayout.CENTER);
+
+        btnCari.addActionListener(e ->
+                tampilkanUser(txtCari.getText().trim()));
+        txtCari.addActionListener(e ->
+                tampilkanUser(txtCari.getText().trim()));
+
+        return panel;
     }
 
-    // --------------------------------------------------------------- data
+    private void tampilkanUser(String keyword) {
+        model.setRowCount(0);
 
-    private void load(String keyword) {
-        try {
-            List<User> list = dao.search(keyword);
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.setRowCount(0);
-            for (User u : list) {
-                model.addRow(new Object[]{
-                    u.getIdUser(), u.getUsername(), u.getRole(), u.isAktif() ? "Ya" : "Tidak"
-                });
+        String sql = "SELECT id_user, username, role, aktif "
+                + "FROM users "
+                + "WHERE username LIKE ? OR role LIKE ? "
+                + "ORDER BY id_user";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String cari = "%" + keyword + "%";
+            ps.setString(1, cari);
+            ps.setString(2, cari);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    model.addRow(new Object[]{
+                        rs.getInt("id_user"),
+                        rs.getString("username"),
+                        rs.getString("role"),
+                        rs.getInt("aktif") == 1 ? "Aktif" : "Nonaktif"
+                    });
+                }
             }
+
         } catch (SQLException ex) {
-            ViewUtil.sqlError(this, "Memuat user", ex);
+            Theme.showMessage(this,
+                    "Gagal memuat data user:\n" + ex.getMessage(),
+                    "Kesalahan Database", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void pick() {
-        int r = table.getSelectedRow();
-        if (r < 0) {
-            return;
-        }
-        selected = Integer.parseInt(table.getValueAt(r, 0).toString());
-        username.setText(table.getValueAt(r, 1).toString());
-        username.setEditable(false); // username tidak boleh diganti
-        role.setSelectedItem(table.getValueAt(r, 2));
-        aktif.setSelected("Ya".equals(table.getValueAt(r, 3)));
-        password.setText("");
-    }
+    private void tambahUser() {
+        String username = txtUsername.getText().trim();
+        char[] password = txtPassword.getPassword();
 
-    private boolean isOwnAccount() {
-        User me = UserSession.getCurrentUser();
-        return me != null && me.getIdUser() == selected;
-    }
-
-    // --------------------------------------------------------------- aksi
-
-    private void save() {
-        if (selected >= 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Klik \"Reset Form\" dahulu untuk menambah user baru.");
-            return;
-        }
-        char[] pw = password.getPassword();
         try {
-            String name = username.getText().trim();
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException("Username wajib diisi");
+            String role = cmbRole.getSelectedItem().toString();
+            int aktif = chkAktif.isSelected() ? 1 : 0;
+
+            if (username.isEmpty() || password.length == 0) {
+                Theme.showMessage(this,
+                        "Username dan password wajib diisi.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            if (pw.length == 0) {
-                throw new IllegalArgumentException("Password wajib diisi");
+
+            if (password.length < 8) {
+                Theme.showMessage(this,
+                        "Password minimal 8 karakter.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            dao.insert(name, pw, role.getSelectedItem().toString(), aktif.isSelected());
-            load("");
-            clear();
+
+            String sql = "INSERT INTO users "
+                    + "(username, password_hash, role, aktif) "
+                    + "VALUES (?, ?, ?, ?)";
+
+            try (Connection conn = Database.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, username);
+                ps.setString(2,
+                        PasswordUtil.hash(password));
+                ps.setString(3, role);
+                ps.setInt(4, aktif);
+                ps.executeUpdate();
+
+                Theme.showMessage(this, "User berhasil ditambahkan.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+
+                resetForm();
+                tampilkanUser(txtCari.getText().trim());
+            }
+
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1062) {
+                Theme.showMessage(this, "Username sudah digunakan.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                Theme.showMessage(this,
+                        "Gagal menambahkan user:\n" + ex.getMessage(),
+                        "Kesalahan", JOptionPane.ERROR_MESSAGE);
+            }
         } catch (Exception ex) {
-            handle(ex, "Menyimpan user");
+            Theme.showMessage(this,
+                    "Terjadi kesalahan:\n" + ex.getMessage(),
+                    "Kesalahan", JOptionPane.ERROR_MESSAGE);
         } finally {
-            Arrays.fill(pw, '\0');
+            Arrays.fill(password, '\0');
         }
     }
 
-    private void update() {
-        if (!requireSelection()) {
+    private void ubahUser() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this,
+                    "Pilih user pada tabel terlebih dahulu.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        String newRole = role.getSelectedItem().toString();
-        if (isOwnAccount() && (!aktif.isSelected()
-                || !newRole.equals(UserSession.getCurrentUser().getRole()))) {
-            JOptionPane.showMessageDialog(this,
-                    "Anda tidak dapat menonaktifkan atau mengubah role akun yang sedang dipakai.");
-            return;
-        }
-        try {
-            dao.update(selected, newRole, aktif.isSelected());
-            load("");
-            clear();
-        } catch (SQLException ex) {
-            ViewUtil.sqlError(this, "Mengubah user", ex);
-        }
-    }
 
-    private void resetPassword() {
-        if (!requireSelection()) {
-            return;
-        }
-        char[] pw = password.getPassword();
+        String username = txtUsername.getText().trim();
+        char[] password = txtPassword.getPassword();
+
         try {
-            if (pw.length == 0) {
-                throw new IllegalArgumentException("Isi password baru terlebih dahulu");
+            String role = cmbRole.getSelectedItem().toString();
+            int aktif = chkAktif.isSelected() ? 1 : 0;
+
+            if (username.isEmpty()) {
+                Theme.showMessage(this, "Username wajib diisi.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            dao.resetPassword(selected, pw);
-            JOptionPane.showMessageDialog(this, "Password berhasil direset.");
-            clear();
-        } catch (Exception ex) {
-            handle(ex, "Reset password");
-        } finally {
-            Arrays.fill(pw, '\0');
-        }
-    }
 
-    private void delete() {
-        if (!requireSelection()) {
-            return;
-        }
-        if (isOwnAccount()) {
-            JOptionPane.showMessageDialog(this, "Akun yang sedang dipakai tidak dapat dihapus.");
-            return;
-        }
-        int ok = JOptionPane.showConfirmDialog(this, "Hapus user ini?",
-                "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        if (ok != JOptionPane.YES_OPTION) {
-            return;
-        }
-        try {
-            dao.delete(selected);
-            load("");
-            clear();
+            if (isAkunSendiri(idTerpilih)) {
+                if (aktif == 0) {
+                    Theme.showMessage(this,
+                            "Akun yang sedang digunakan tidak boleh dinonaktifkan.",
+                            "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (!"ADMIN".equals(role)) {
+                    Theme.showMessage(this,
+                            "Role ADMIN yang sedang digunakan tidak boleh diturunkan.",
+                            "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+            if (password.length > 0 && password.length < 8) {
+                Theme.showMessage(this,
+                        "Password baru minimal 8 karakter.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String sql;
+            if (password.length == 0) {
+                sql = "UPDATE users SET username=?, role=?, aktif=? "
+                        + "WHERE id_user=?";
+            } else {
+                sql = "UPDATE users SET username=?, password_hash=?, "
+                        + "role=?, aktif=? WHERE id_user=?";
+            }
+
+            try (Connection conn = Database.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, username);
+
+                if (password.length == 0) {
+                    ps.setString(2, role);
+                    ps.setInt(3, aktif);
+                    ps.setInt(4, idTerpilih);
+                } else {
+                    ps.setString(2,
+                            PasswordUtil.hash(password));
+                    ps.setString(3, role);
+                    ps.setInt(4, aktif);
+                    ps.setInt(5, idTerpilih);
+                }
+
+                int hasil = ps.executeUpdate();
+
+                if (hasil > 0) {
+                    Theme.showMessage(this, "Data user berhasil diperbarui.",
+                            "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                    resetForm();
+                    tampilkanUser(txtCari.getText().trim());
+                } else {
+                    Theme.showMessage(this, "Data user tidak ditemukan.",
+                            "Peringatan", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
         } catch (SQLException ex) {
-            ViewUtil.sqlError(this, "Menghapus user", ex);
+            if (ex.getErrorCode() == 1062) {
+                Theme.showMessage(this, "Username sudah digunakan.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                Theme.showMessage(this,
+                        "Gagal mengubah user:\n" + ex.getMessage(),
+                        "Kesalahan", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            Theme.showMessage(this,
+                    "Terjadi kesalahan:\n" + ex.getMessage(),
+                    "Kesalahan", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            Arrays.fill(password, '\0');
         }
     }
 
-    private boolean requireSelection() {
-        if (selected < 0) {
-            JOptionPane.showMessageDialog(this, "Pilih user pada tabel terlebih dahulu.");
-            return false;
+    private void hapusUser() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this, "Pilih user yang akan dihapus.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        return true;
+
+        if (isAkunSendiri(idTerpilih)) {
+            Theme.showMessage(this,
+                    "Akun yang sedang digunakan tidak dapat dihapus.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int baris = tblUser.getSelectedRow();
+        if (baris == -1) return;
+
+        baris = tblUser.convertRowIndexToModel(baris);
+        String username = model.getValueAt(baris, 1).toString();
+
+        int konfirmasi = Theme.showConfirm(
+                this, "Yakin ingin menghapus akun " + username + "?",
+                "Konfirmasi Hapus");
+
+        if (konfirmasi != JOptionPane.YES_OPTION) return;
+
+        String sql = "DELETE FROM users WHERE id_user=?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idTerpilih);
+            int hasil = ps.executeUpdate();
+
+            if (hasil > 0) {
+                Theme.showMessage(this, "User berhasil dihapus.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                resetForm();
+                tampilkanUser(txtCari.getText().trim());
+            } else {
+                Theme.showMessage(this, "Data user tidak ditemukan.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            }
+
+        } catch (SQLException ex) {
+            Theme.showMessage(this,
+                    "Gagal menghapus user:\n" + ex.getMessage(),
+                    "Kesalahan", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    private void clear() {
-        selected = -1;
-        username.setText("");
-        username.setEditable(true);
-        password.setText("");
-        role.setSelectedIndex(0);
-        aktif.setSelected(true);
-        table.clearSelection();
-        username.requestFocus();
+    private void pilihData() {
+        int baris = tblUser.getSelectedRow();
+        if (baris == -1) return;
+
+        baris = tblUser.convertRowIndexToModel(baris);
+        idTerpilih = Integer.parseInt(
+                model.getValueAt(baris, 0).toString());
+
+        txtUsername.setText(model.getValueAt(baris, 1).toString());
+        cmbRole.setSelectedItem(model.getValueAt(baris, 2).toString());
+        chkAktif.setSelected(
+                model.getValueAt(baris, 3).toString().equals("Aktif"));
+
+        txtPassword.setText("");
     }
 
-    private void handle(Exception ex, String action) {
-        if (ex instanceof SQLException) {
-            ViewUtil.sqlError(this, action, (SQLException) ex);
-        } else {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Validasi", JOptionPane.WARNING_MESSAGE);
-        }
+    private void resetForm() {
+        idTerpilih = -1;
+        txtUsername.setText("");
+        txtPassword.setText("");
+        cmbRole.setSelectedIndex(0);
+        chkAktif.setSelected(true);
+        tblUser.clearSelection();
+        txtUsername.requestFocus();
     }
 }

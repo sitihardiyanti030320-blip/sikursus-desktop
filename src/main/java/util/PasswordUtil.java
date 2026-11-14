@@ -15,17 +15,18 @@ public final class PasswordUtil {
 
     private PasswordUtil() {}
 
+    // Dipakai saat membuat akun (UserSeeder / UserFrame).
     public static String hash(char[] password) {
-        if (password == null || password.length < 6) {
-            throw new IllegalArgumentException("Password minimal 6 karakter");
-        }
         byte[] salt = new byte[16];
         RANDOM.nextBytes(salt);
         PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, KEY_LENGTH);
         try {
-            byte[] hash = SecretKeyFactory.getInstance(ALGORITHM).generateSecret(spec).getEncoded();
-            return ITERATIONS + ":" + Base64.getEncoder().encodeToString(salt)
-                    + ":" + Base64.getEncoder().encodeToString(hash);
+            byte[] hash = SecretKeyFactory.getInstance(ALGORITHM)
+                    .generateSecret(spec)
+                    .getEncoded();
+            return ITERATIONS + ":"
+                    + Base64.getEncoder().encodeToString(salt) + ":"
+                    + Base64.getEncoder().encodeToString(hash);
         } catch (GeneralSecurityException ex) {
             throw new IllegalStateException("Gagal membuat password hash", ex);
         } finally {
@@ -33,17 +34,28 @@ public final class PasswordUtil {
         }
     }
 
+    // Dipakai saat login.
     public static boolean verify(char[] password, String stored) {
-        if (password == null || stored == null || stored.trim().isEmpty()) return false;
+        if (stored == null || stored.trim().isEmpty()) {
+            return false;
+        }
+
         String[] parts = stored.split(":");
-        if (parts.length != 3) return false;
+        if (parts.length != 3) {
+            return false;
+        }
+
         try {
             int iterations = Integer.parseInt(parts[0]);
             byte[] salt = Base64.getDecoder().decode(parts[1]);
             byte[] expected = Base64.getDecoder().decode(parts[2]);
-            PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, expected.length * 8);
+
+            PBEKeySpec spec = new PBEKeySpec(
+                    password, salt, iterations, expected.length * 8);
             try {
-                byte[] actual = SecretKeyFactory.getInstance(ALGORITHM).generateSecret(spec).getEncoded();
+                byte[] actual = SecretKeyFactory.getInstance(ALGORITHM)
+                        .generateSecret(spec)
+                        .getEncoded();
                 return MessageDigest.isEqual(expected, actual);
             } finally {
                 spec.clearPassword();

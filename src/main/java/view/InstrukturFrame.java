@@ -1,104 +1,260 @@
 package view;
 
 import dao.InstrukturDAO;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Instruktur;
+import util.Theme;
 
 public class InstrukturFrame extends JFrame {
-    private final JTextField nama = new JTextField();
-    private final JTextField keahlian = new JTextField();
-    private final JTextField hp = new JTextField();
-    private final JTextField email = new JTextField();
-    private final JTextField search = new JTextField(18);
-    private final JTable table = new JTable(ViewUtil.tableModel("ID", "Nama", "Keahlian", "No. HP", "Email"));
+
+    private JTextField txtNama, txtKeahlian, txtNoHp, txtEmail, txtCari;
+    private JTable tabel;
+    private DefaultTableModel model;
+    private int idTerpilih = -1;
+
     private final InstrukturDAO dao = new InstrukturDAO();
-    private int selected = -1;
 
     public InstrukturFrame() {
-        super("Master Instruktur - SIKURSUS Desktop");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        ViewUtil.setupFrame(this, 940, 650);
-        build();
-        load("");
+        setTitle("SIKURSUS - Data Instruktur");
+        setSize(950, 650);
+        Theme.styleFrame(this);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        initComponents();
+        tampilData("");
     }
 
-    private void build() {
-        JPanel root = ViewUtil.root("Master Data Instruktur");
-        JPanel body = ViewUtil.body();
+    private void initComponents() {
+        JPanel form = Theme.createCard(
+                new GridBagLayout(), "FORM INSTRUKTUR");
 
-        JPanel form = ViewUtil.formPanel();
-        ViewUtil.addFormRow(form, 0, "Nama Instruktur", nama);
-        ViewUtil.addFormRow(form, 1, "Keahlian", keahlian);
-        ViewUtil.addFormRow(form, 2, "Nomor HP", hp);
-        ViewUtil.addFormRow(form, 3, "Email", email);
+        txtNama = new JTextField();
+        txtKeahlian = new JTextField();
+        txtNoHp = new JTextField();
+        txtEmail = new JTextField();
 
-        JButton simpan = ViewUtil.primaryButton("Simpan");
-        JButton ubah = ViewUtil.updateButton("Ubah");
-        JButton hapus = ViewUtil.dangerButton("Hapus");
-        JButton reset = ViewUtil.neutralButton("Reset");
-        JPanel formBox = new JPanel(new BorderLayout());
-        formBox.setBackground(ViewUtil.BG);
-        formBox.add(form, BorderLayout.CENTER);
-        formBox.add(ViewUtil.actionPanel(simpan, ubah, hapus, reset), BorderLayout.SOUTH);
+        Theme.addField(form, 0, 0, "Nama Instruktur", txtNama);
+        Theme.addField(form, 0, 1, "Keahlian", txtKeahlian);
+        Theme.addField(form, 1, 0, "Nomor HP", txtNoHp);
+        Theme.addField(form, 1, 1, "Email", txtEmail);
 
-        JButton cari = ViewUtil.updateButton("Cari");
-        JPanel tableBox = new JPanel(new BorderLayout(0, 8));
-        tableBox.setBackground(ViewUtil.CARD);
-        tableBox.add(ViewUtil.searchPanel("Pencarian", search, cari), BorderLayout.NORTH);
-        tableBox.add(ViewUtil.tableScroll(table), BorderLayout.CENTER);
+        JButton btnSimpan = Theme.createButton("Simpan", Theme.BTN_SAVE);
+        JButton btnUbah = Theme.createButton("Ubah", Theme.BTN_EDIT);
+        JButton btnHapus = Theme.createButton("Hapus", Theme.BTN_DELETE);
+        JButton btnReset = Theme.createButton("Reset", Theme.BTN_NEUTRAL);
 
-        body.add(ViewUtil.section("Form Instruktur", formBox), BorderLayout.NORTH);
-        body.add(ViewUtil.section("Data Instruktur", tableBox), BorderLayout.CENTER);
-        root.add(body, BorderLayout.CENTER);
-        setContentPane(root);
+        Theme.addButtonRow(form, 2, 4,
+                btnSimpan, btnUbah, btnHapus, btnReset);
 
-        simpan.addActionListener(e -> save());
-        ubah.addActionListener(e -> update());
-        hapus.addActionListener(e -> delete());
-        reset.addActionListener(e -> clear());
-        cari.addActionListener(e -> load(search.getText()));
-        search.addActionListener(e -> load(search.getText()));
-        table.getSelectionModel().addListSelectionListener(e -> pick());
-        getRootPane().setDefaultButton(simpan);
+        JPanel tablePanel = Theme.createCard(
+                new BorderLayout(0, 12), "DATA INSTRUKTUR");
+
+        txtCari = new JTextField();
+        txtCari.setToolTipText("Cari nama atau keahlian instruktur");
+
+        JButton btnCari = Theme.createButton("Cari", Theme.BTN_EDIT);
+
+        model = new DefaultTableModel(
+                new String[]{"ID", "Nama", "Keahlian", "No. HP", "Email"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tabel = new JTable(model);
+        Theme.styleTable(tabel);
+        tabel.setAutoCreateRowSorter(true);
+        Theme.fixedWidth(tabel, 0, 50);
+
+        tablePanel.add(
+                Theme.createSearchBar(txtCari, btnCari),
+                BorderLayout.NORTH);
+        tablePanel.add(Theme.createScroll(tabel), BorderLayout.CENTER);
+
+        setContentPane(Theme.createPage(
+                "DATA INSTRUKTUR",
+                "Kelola informasi instruktur kursus",
+                form, tablePanel));
+
+        btnSimpan.addActionListener(e -> simpan());
+        btnUbah.addActionListener(e -> ubah());
+        btnHapus.addActionListener(e -> hapus());
+        btnReset.addActionListener(e -> reset());
+
+        btnCari.addActionListener(e ->
+                tampilData(txtCari.getText().trim()));
+        txtCari.addActionListener(e ->
+                tampilData(txtCari.getText().trim()));
+
+        tabel.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()
+                    && tabel.getSelectedRow() >= 0) {
+                pilihData();
+            }
+        });
     }
 
-    private Instruktur data() {
-        Instruktur x = new Instruktur();
-        x.setId(Math.max(selected, 0));
-        x.setNama(nama.getText());
-        x.setKeahlian(keahlian.getText());
-        x.setNoHp(hp.getText());
-        x.setEmail(email.getText());
-        return x;
-    }
+    private void tampilData(String keyword) {
+        model.setRowCount(0);
 
-    private void save() { try { dao.insert(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Menyimpan instruktur"); } }
-    private void update() { if (selected < 0) { JOptionPane.showMessageDialog(this, "Pilih instruktur."); return; } try { dao.update(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Mengubah instruktur"); } }
-    private void delete() { if (selected < 0) return; if (JOptionPane.showConfirmDialog(this, "Hapus instruktur?", "Konfirmasi", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return; try { dao.delete(selected); load(""); clear(); } catch (SQLException ex) { ViewUtil.sqlError(this, "Menghapus instruktur", ex); } }
-
-    private void load(String q) {
         try {
-            List<Instruktur> list = dao.search(q);
-            DefaultTableModel m = (DefaultTableModel) table.getModel();
-            m.setRowCount(0);
-            for (Instruktur x : list) m.addRow(new Object[]{x.getId(), x.getNama(), x.getKeahlian(), x.getNoHp(), x.getEmail()});
-        } catch (SQLException ex) { ViewUtil.sqlError(this, "Memuat instruktur", ex); }
+            List<Instruktur> data = dao.search(keyword);
+
+            for (Instruktur i : data) {
+                model.addRow(new Object[]{
+                    i.getId(),
+                    i.getNama(),
+                    i.getKeahlian(),
+                    i.getNoHp(),
+                    i.getEmail()
+                });
+            }
+        } catch (SQLException ex) {
+            showError("Memuat data instruktur", ex);
+        }
     }
 
-    private void pick() {
-        int r = table.getSelectedRow();
-        if (r < 0) return;
-        selected = Integer.parseInt(table.getValueAt(r, 0).toString());
-        nama.setText(table.getValueAt(r, 1).toString());
-        keahlian.setText(table.getValueAt(r, 2).toString());
-        hp.setText(String.valueOf(table.getValueAt(r, 3)));
-        email.setText(String.valueOf(table.getValueAt(r, 4)));
+    private void pilihData() {
+        int row = tabel.getSelectedRow();
+        if (row < 0) return;
+
+        row = tabel.convertRowIndexToModel(row);
+
+        idTerpilih = Integer.parseInt(
+                model.getValueAt(row, 0).toString());
+
+        txtNama.setText(Theme.str(model.getValueAt(row, 1)));
+        txtKeahlian.setText(Theme.str(model.getValueAt(row, 2)));
+        txtNoHp.setText(Theme.str(model.getValueAt(row, 3)));
+        txtEmail.setText(Theme.str(model.getValueAt(row, 4)));
     }
 
-    private void clear() { selected = -1; nama.setText(""); keahlian.setText(""); hp.setText(""); email.setText(""); table.clearSelection(); nama.requestFocus(); }
-    private void handle(Exception ex, String action) { if (ex instanceof SQLException) ViewUtil.sqlError(this, action, (SQLException) ex); else JOptionPane.showMessageDialog(this, ex.getMessage()); }
+    private boolean validasi() {
+        if (txtNama.getText().trim().isEmpty()
+                || txtKeahlian.getText().trim().isEmpty()) {
+            Theme.showMessage(this,
+                    "Nama dan keahlian wajib diisi.",
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    // Membuat objek Instruktur dari isi form.
+    // Validasi format HP dan email dilakukan oleh class model.
+    private Instruktur getFormData() {
+        return new Instruktur(
+                idTerpilih < 0 ? 0 : idTerpilih,
+                txtNama.getText().trim(),
+                txtNoHp.getText().trim(),
+                txtKeahlian.getText().trim(),
+                txtEmail.getText().trim());
+    }
+
+    private void simpan() {
+        if (!validasi()) return;
+
+        try {
+            if (dao.insert(getFormData())) {
+                Theme.showMessage(this,
+                        "Data instruktur berhasil disimpan.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            } else {
+                Theme.showMessage(this,
+                        "Gagal menyimpan data instruktur.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IllegalArgumentException ex) {
+            Theme.showMessage(this, ex.getMessage(),
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            showError("Menyimpan data instruktur", ex);
+        }
+    }
+
+    private void ubah() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this,
+                    "Pilih data yang ingin diubah.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!validasi()) return;
+
+        try {
+            if (dao.update(getFormData())) {
+                Theme.showMessage(this,
+                        "Data instruktur berhasil diubah.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            } else {
+                Theme.showMessage(this,
+                        "Data instruktur tidak ditemukan.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (IllegalArgumentException ex) {
+            Theme.showMessage(this, ex.getMessage(),
+                    "Validasi", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            showError("Mengubah data instruktur", ex);
+        }
+    }
+
+    private void hapus() {
+        if (idTerpilih == -1) {
+            Theme.showMessage(this,
+                    "Pilih data yang ingin dihapus.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int konfirmasi = Theme.showConfirm(
+                this, "Hapus data instruktur ini?",
+                "Konfirmasi Hapus");
+
+        if (konfirmasi != JOptionPane.YES_OPTION) return;
+
+        try {
+            if (dao.delete(idTerpilih)) {
+                Theme.showMessage(this,
+                        "Data berhasil dihapus.",
+                        "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                reset();
+            }
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1451) {
+                Theme.showMessage(this,
+                        "Instruktur tidak dapat dihapus karena masih digunakan oleh kelas.",
+                        "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                showError("Menghapus data instruktur", ex);
+            }
+        }
+    }
+
+    private void reset() {
+        idTerpilih = -1;
+        tabel.clearSelection();
+
+        txtNama.setText("");
+        txtKeahlian.setText("");
+        txtNoHp.setText("");
+        txtEmail.setText("");
+        txtCari.setText("");
+
+        tampilData("");
+        txtNama.requestFocus();
+    }
+
+    private void showError(String aksi, SQLException ex) {
+        Theme.showMessage(this,
+                "Gagal " + aksi + ":\n" + ex.getMessage(),
+                "Database Error", JOptionPane.ERROR_MESSAGE);
+    }
 }

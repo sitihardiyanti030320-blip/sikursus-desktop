@@ -11,30 +11,47 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 public final class WindowManager {
-    private static final Map<Class<? extends JFrame>, JFrame> WINDOWS = new HashMap<>();
+    private static final Map<Class<? extends JFrame>, JFrame> WINDOWS
+            = new HashMap<>();
+
     private WindowManager() {}
 
-    public static synchronized <T extends JFrame> void open(Class<T> type, Supplier<T> factory) {
+    public static synchronized <T extends JFrame> void open(
+            Class<T> type,
+            Supplier<T> factory) {
+
         JFrame frame = WINDOWS.get(type);
+
         if (frame == null || !frame.isDisplayable()) {
             frame = factory.get();
             frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            final JFrame tracked = frame;
+
+            JFrame trackedFrame = frame;
             frame.addWindowListener(new WindowAdapter() {
-                @Override public void windowClosed(WindowEvent e) {
-                    synchronized (WindowManager.class) { WINDOWS.remove(type, tracked); }
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    synchronized (WindowManager.class) {
+                        WINDOWS.remove(type, trackedFrame);
+                    }
                 }
             });
+
             WINDOWS.put(type, frame);
         }
-        if ((frame.getExtendedState() & Frame.ICONIFIED) == Frame.ICONIFIED) frame.setExtendedState(Frame.NORMAL);
+
+        if ((frame.getExtendedState() & Frame.ICONIFIED) == Frame.ICONIFIED) {
+            frame.setExtendedState(Frame.NORMAL);
+        }
+
         frame.setVisible(true);
         frame.toFront();
         frame.requestFocus();
     }
 
     public static synchronized void closeAll() {
-        for (JFrame frame : new ArrayList<>(WINDOWS.values())) frame.dispose();
+        for (JFrame frame : new ArrayList<>(WINDOWS.values())) {
+            frame.dispose();
+        }
         WINDOWS.clear();
     }
 }
